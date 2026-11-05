@@ -5,33 +5,285 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Moje PDF</title>
   <style>
-    body { font-family: sans-serif; margin: 0; display: flex; height: 100vh; }
-    #menu { width: 280px; overflow-y: auto; padding: 1rem; background: #f3f3f3; }
-    #menu a { display: block; padding: .5rem; color: #222; text-decoration: none; border-radius: 6px; }
-    #menu a:hover { background: #ddd; }
-    #viewer { flex: 1; border: none; }
+    :root {
+      --bg: #f4f5f7;
+      --panel: #ffffff;
+      --text: #1d2733;
+      --muted: #6a7686;
+      --line: #dde1e7;
+      --accent: #1f5f8b;
+      --hover: #e8eef4;
+      --active: #d5e4f0;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #14181d;
+        --panel: #1b2027;
+        --text: #e3e8ee;
+        --muted: #8b97a6;
+        --line: #2b323b;
+        --accent: #6ab0dd;
+        --hover: #242b34;
+        --active: #2a3a4a;
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+    }
+    #menu {
+      width: 310px;
+      flex-shrink: 0;
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    #menu header { padding: 1rem 1rem .75rem; }
+    #menu h1 { font-size: 1.15rem; margin: 0 0 .75rem; }
+    #search {
+      width: 100%;
+      padding: .55rem .7rem;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      font: inherit;
+    }
+    #search:focus-visible, a:focus-visible, summary:focus-visible, button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+    #tree { flex: 1; overflow-y: auto; padding: 0 .5rem 1rem; }
+    details { margin-bottom: .15rem; }
+    summary {
+      cursor: pointer;
+      padding: .5rem .6rem;
+      border-radius: 6px;
+      font-weight: 600;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::before {
+      content: "";
+      width: .45rem; height: .45rem;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(-45deg);
+      margin-right: .6rem;
+      transition: transform .15s;
+      flex-shrink: 0;
+    }
+    details[open] > summary::before { transform: rotate(45deg); }
+    summary .name { flex: 1; }
+    summary .count { color: var(--muted); font-weight: 400; font-size: .85rem; }
+    summary:hover { background: var(--hover); }
+    .files a {
+      display: block;
+      padding: .4rem .6rem .4rem 1.9rem;
+      color: var(--text);
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: .93rem;
+      line-height: 1.3;
+    }
+    .files a:hover { background: var(--hover); }
+    .files a.active { background: var(--active); color: var(--accent); font-weight: 600; }
+    .empty { padding: .4rem .6rem .6rem 1.9rem; color: var(--muted); font-size: .88rem; }
+    #main { flex: 1; display: flex; flex-direction: column; min-width: 0; height: 100%; }
+    #bar {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .6rem 1rem;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      min-height: 3.2rem;
+    }
+    #title { flex: 1; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #open {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: .9rem;
+      white-space: nowrap;
+    }
+    #open:hover { text-decoration: underline; }
+    #toggle {
+      display: none;
+      background: none;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--text);
+      padding: .35rem .6rem;
+      font: inherit;
+      cursor: pointer;
+    }
+    #viewer { flex: 1; border: none; width: 100%; background: var(--bg); }
+    #hint {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      padding: 2rem;
+      text-align: center;
+    }
+    @media (max-width: 760px) {
+      #toggle { display: inline-block; }
+      #menu {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: min(310px, 88vw);
+        z-index: 10;
+        transform: translateX(-100%);
+        transition: transform .2s;
+      }
+      body.menu-open #menu { transform: none; box-shadow: 0 0 0 100vmax rgba(0,0,0,.4); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
   </style>
 </head>
 <body>
-  <div id="menu"><h3>Moje PDF</h3></div>
-  <iframe id="viewer"></iframe>
+  <nav id="menu">
+    <header>
+      <h1>Moje PDF</h1>
+      <input id="search" type="search" placeholder="Hledat soubor…" aria-label="Hledat soubor">
+    </header>
+    <div id="tree"></div>
+  </nav>
+
+  <div id="main">
+    <div id="bar">
+      <button id="toggle" aria-label="Zobrazit menu">Menu</button>
+      <span id="title">Vyber soubor z menu</span>
+      <a id="open" href="#" target="_blank" rel="noopener" hidden>Otevřít v nové záložce</a>
+    </div>
+    <div id="hint">Vyber složku vlevo a klikni na PDF, které chceš otevřít.</div>
+    <iframe id="viewer" title="Náhled PDF" hidden></iframe>
+  </div>
 
   <script>
-    // Sem napiš cesty k svým PDF souborům
-    const soubory = [
-      "pdf/vektory.pdf"
+    // ============================================================
+    // ZDE UPRAV SVOJE SLOŽKY A SOUBORY
+    // "slozka" = přesný název složky v repozitáři (doporučuju bez diakritiky a mezer)
+    // "soubory" = názvy PDF souborů v této složce
+    // ============================================================
+    const KNIHOVNA = [
+      {
+        nazev: "Elektrotechnika",
+        slozka: "elektrotechnika",
+        soubory: []
+      },
+      {
+        nazev: "Matematika",
+        slozka: "matematika",
+        soubory: []
+      },
+      {
+        nazev: "Fyzika",
+        slozka: "fyzika",
+        soubory: ["vektory.pdf"]
+      },
+      {
+        nazev: "Technická dokumentace",
+        slozka: "technicka-dokumentace",
+        soubory: []
+      },
+      {
+        nazev: "Materiály pro elektrotechniku",
+        slozka: "materialy-pro-elektrotechniku",
+        soubory: []
+      }
     ];
+    // ============================================================
 
-    const menu = document.getElementById("menu");
+    const tree = document.getElementById("tree");
     const viewer = document.getElementById("viewer");
+    const hint = document.getElementById("hint");
+    const title = document.getElementById("title");
+    const openLink = document.getElementById("open");
+    const search = document.getElementById("search");
 
-    soubory.forEach(cesta => {
-      const a = document.createElement("a");
-      a.textContent = cesta.split("/").pop().replace(".pdf", "");
-      a.href = "#";
-      a.onclick = e => { e.preventDefault(); viewer.src = cesta; };
-      menu.appendChild(a);
-    });
+    const cesta = (s, f) => encodeURI(`${s.slozka}/${f}`);
+    const hezkyNazev = f => f.replace(/\.pdf$/i, "").replace(/[-_]+/g, " ");
+
+    function vykresli(filtr = "") {
+      const q = filtr.trim().toLowerCase();
+      tree.innerHTML = "";
+      KNIHOVNA.forEach(s => {
+        const shody = s.soubory.filter(f => hezkyNazev(f).toLowerCase().includes(q));
+        if (q && !shody.length) return;
+
+        const d = document.createElement("details");
+        if (q || s.slozka === aktivniSlozka) d.open = true;
+
+        const sum = document.createElement("summary");
+        sum.innerHTML = `<span class="name"></span><span class="count">${shody.length}</span>`;
+        sum.querySelector(".name").textContent = s.nazev;
+        d.appendChild(sum);
+
+        const box = document.createElement("div");
+        box.className = "files";
+        if (!shody.length) {
+          box.innerHTML = '<div class="empty">Zatím žádné soubory</div>';
+        }
+        shody.forEach(f => {
+          const a = document.createElement("a");
+          const p = cesta(s, f);
+          a.href = "#" + p;
+          a.textContent = hezkyNazev(f);
+          if (p === aktivniCesta) a.classList.add("active");
+          a.onclick = e => { e.preventDefault(); otevri(s, f); };
+          box.appendChild(a);
+        });
+        d.appendChild(box);
+        tree.appendChild(d);
+      });
+    }
+
+    let aktivniCesta = "";
+    let aktivniSlozka = "";
+
+    function otevri(s, f) {
+      aktivniCesta = cesta(s, f);
+      aktivniSlozka = s.slozka;
+      viewer.src = aktivniCesta;
+      viewer.hidden = false;
+      hint.hidden = true;
+      title.textContent = `${s.nazev} / ${hezkyNazev(f)}`;
+      openLink.href = aktivniCesta;
+      openLink.hidden = false;
+      history.replaceState(null, "", "#" + aktivniCesta);
+      document.body.classList.remove("menu-open");
+      vykresli(search.value);
+    }
+
+    // Otevření podle odkazu v adrese (např. ...github.io/repo/#matematika/priklad-1.pdf)
+    function zHashe() {
+      const h = decodeURI(location.hash.slice(1));
+      if (!h) return;
+      for (const s of KNIHOVNA) {
+        for (const f of s.soubory) {
+          if (`${s.slozka}/${f}` === h) { otevri(s, f); return; }
+        }
+      }
+    }
+
+    search.addEventListener("input", () => vykresli(search.value));
+    document.getElementById("toggle").onclick = () => document.body.classList.toggle("menu-open");
+
+    vykresli();
+    zHashe();
   </script>
 </body>
 </html>
