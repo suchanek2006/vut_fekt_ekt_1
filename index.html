@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Moje PDF</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; display: flex; height: 100vh; }
+    #menu { width: 280px; overflow-y: auto; padding: 1rem; background: #f3f3f3; }
+    #menu a { display: block; padding: .5rem; color: #222; text-decoration: none; border-radius: 6px; }
+    #menu a:hover { background: #ddd; }
+    #viewer { flex: 1; border: none; }
+  </style>
+</head>
+<body>
+  <div id="menu"><h3>Moje PDF</h3></div>
+  <iframe id="viewer"></iframe>
+
+  <script>
+    // Sem napiš cesty k svým PDF souborům
+    const soubory = [
+      "pdf/prvni.pdf",
+      "pdf/druhy.pdf",
+      "pdf/treti.pdf"
+    ];
+
+    const menu = document.getElementById("menu");
+    const viewer = document.getElementById("viewer");
+
+    soubory.forEach(cesta => {
+      const a = document.createElement("a");
+      a.textContent = cesta.split("/").pop().replace(".pdf", "");
+      a.href = "#";
+      a.onclick = e => { e.preventDefault(); viewer.src = cesta; };
+      menu.appendChild(a);
+    });
+  </script>
+</body>
+</html>
