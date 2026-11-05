@@ -28,6 +28,7 @@
       }
     }
     * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
     html, body { height: 100%; margin: 0; }
     body {
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -176,6 +177,7 @@
     // ============================================================
     // ZDE UPRAV SVOJE SLOŽKY A SOUBORY
     // "slozka" = přesný název složky v repozitáři (doporučuju bez diakritiky a mezer)
+    //            pokud jsou PDF přímo v kořeni repozitáře, nech "slozka" prázdné: ""
     // "soubory" = názvy PDF souborů v této složce
     // ============================================================
     const KNIHOVNA = [
@@ -214,7 +216,7 @@
     const openLink = document.getElementById("open");
     const search = document.getElementById("search");
 
-    const cesta = (s, f) => encodeURI(`${s.slozka}/${f}`);
+    const cesta = (s, f) => encodeURI(s.slozka ? `${s.slozka}/${f}` : f);
     const hezkyNazev = f => f.replace(/\.pdf$/i, "").replace(/[-_]+/g, " ");
 
     function vykresli(filtr = "") {
@@ -274,7 +276,7 @@
       if (!h) return;
       for (const s of KNIHOVNA) {
         for (const f of s.soubory) {
-          if (`${s.slozka}/${f}` === h) { otevri(s, f); return; }
+          if (decodeURI(cesta(s, f)) === h) { otevri(s, f); return; }
         }
       }
     }
