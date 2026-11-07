@@ -1,0 +1,1282 @@
+%!TEX program = pdflatex
+% =====================================================================
+%  VEKTORY – studijní text pro 1. ročník VUT FEKT (obor EKT)
+%  Překlad: pdflatex (nebo Overleaf – kompilátor pdfLaTeX)
+% =====================================================================
+\documentclass[a4paper,11pt]{article}
+
+% ---------- Kódování, jazyk, písmo ----------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[czech]{babel}
+\usepackage{lmodern}
+\usepackage[expansion=false]{microtype}
+
+% ---------- Rozvržení stránky ----------
+\usepackage[a4paper,top=2.6cm,bottom=2.6cm,left=2.5cm,right=2.5cm,headheight=24pt]{geometry}
+\usepackage{setspace}
+\setstretch{1.08}
+
+% ---------- Matematika ----------
+\usepackage{amsmath,amssymb,mathtools}
+
+% ---------- Barvy ----------
+\usepackage[dvipsnames,table]{xcolor}
+\definecolor{primary}{HTML}{1F4E79}   % hlavní modrá
+\definecolor{accent}{HTML}{B03A2E}    % výrazná červená (výsledné vektory)
+\definecolor{veccol1}{HTML}{1F6FB2}   % modrá – první vektor
+\definecolor{veccol2}{HTML}{2E8B57}   % zelená – druhý vektor
+\definecolor{ektcol}{HTML}{C77700}    % oranžová – rámečky ECT
+
+% ---------- Grafika ----------
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,calc,angles,babel}
+\tikzset{
+  vec/.style   ={-{Stealth[length=2.6mm,width=2mm]}, very thick, veccol1},
+  vecg/.style  ={-{Stealth[length=2.6mm,width=2mm]}, very thick, veccol2},
+  vecr/.style  ={-{Stealth[length=2.6mm,width=2mm]}, very thick, accent},
+  ax/.style    ={-{Stealth[length=2.2mm,width=1.6mm]}, thick, gray!70!black},
+  helpl/.style ={dashed, gray!70},
+}
+
+% ---------- Rámečky ----------
+\usepackage[most]{tcolorbox}
+\usepackage{etoolbox}
+
+\newtcolorbox[auto counter,number within=section]{definice}[1]{%
+  enhanced, sharp corners=south, arc=2mm,
+  colback=primary!5, colframe=primary, boxrule=0.8pt,
+  coltitle=white, colbacktitle=primary, fonttitle=\bfseries,
+  title={Definice~\thetcbcounter\ \textnormal{---} #1},
+  before skip=10pt, after skip=10pt}
+
+\newtcolorbox[auto counter,number within=section]{veta}[1]{%
+  enhanced, sharp corners=south, arc=2mm,
+  colback=accent!5, colframe=accent!85!black, boxrule=0.8pt,
+  coltitle=white, colbacktitle=accent!85!black, fonttitle=\bfseries,
+  title={Věta~\thetcbcounter\ \textnormal{---} #1},
+  before skip=10pt, after skip=10pt}
+
+\newtcolorbox[auto counter,number within=section]{priklad}[1]{%
+  enhanced, breakable, sharp corners=south, arc=2mm,
+  colback=green!4!white, colframe=green!45!black, boxrule=0.8pt,
+  coltitle=white, colbacktitle=green!45!black, fonttitle=\bfseries,
+  title={Příklad~\thetcbcounter\ \textnormal{---} #1},
+  before skip=10pt, after skip=10pt}
+
+\newtcolorbox{poznamka}{%
+  enhanced, frame hidden, sharp corners, boxrule=0pt,
+  colback=gray!10, borderline west={3pt}{0pt}{gray!60},
+  before upper={\textbf{Poznámka.}\ },
+  before skip=8pt, after skip=8pt}
+
+\newtcolorbox{pozor}{%
+  enhanced, frame hidden, sharp corners, boxrule=0pt,
+  colback=red!6, borderline west={3pt}{0pt}{red!70!black},
+  before upper={\textbf{\color{red!70!black}Pozor!}\ },
+  before skip=8pt, after skip=8pt}
+
+\newtcolorbox{ekt}[1][Použití v elektrotechnice]{%
+  enhanced, breakable, arc=2mm, boxrule=0.8pt,
+  colback=ektcol!7, colframe=ektcol,
+  coltitle=black, colbacktitle=ektcol!30, fonttitle=\bfseries\small,
+  title={$\blacktriangleright$ #1},
+  before skip=10pt, after skip=10pt}
+
+% ---------- Seznamy, tabulky, odkazy ----------
+\usepackage{float}
+\usepackage{enumitem}
+\setlist{itemsep=2pt,topsep=4pt}
+\usepackage{booktabs}
+\usepackage{array}
+\renewcommand{\arraystretch}{1.25}
+
+% ---------- Nadpisy ----------
+\usepackage{titlesec}
+\usepackage{needspace}
+\titleformat{\section}
+  {\Large\bfseries\color{primary}}{\thesection}{0.8em}{}[{\color{primary}\titlerule[1pt]}]
+\titleformat{\subsection}
+  {\large\bfseries\color{primary!85!black}}{\thesubsection}{0.7em}{}
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{primary!70!black}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{20pt}{10pt}
+\titlespacing*{\subsection}{0pt}{14pt}{6pt}
+\pretocmd{\section}{\Needspace*{16\baselineskip}}{}{}
+\pretocmd{\subsection}{\Needspace*{6\baselineskip}}{}{}
+
+% ---------- Záhlaví a zápatí ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{primary}\textbf{Kinematika}}
+\fancyhead[R]{\small\color{primary}\nouppercase{\leftmark}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{primary}\leaders\hrule height \headrulewidth\hfill}}
+
+\usepackage[hypertexnames=false,pdfpagelabels,colorlinks=true,linkcolor=primary,urlcolor=primary,citecolor=primary,
+            pdftitle={Kinematika – studijní text},pdfauthor={Studijní materiál}]{hyperref}
+
+% ---------- Vlastní příkazy ----------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\abs}[1]{\left\lvert #1\right\rvert}
+\newcommand{\ii}{\vec{\imath}}
+\newcommand{\jj}{\vec{\jmath}}
+\newcommand{\kk}{\vec{k}}
+\newcommand{\jed}[1]{\,\mathrm{#1}}      % jednotky: 5\jed{N}
+\newcommand{\dc}{{,}}                    % desetinná čárka v matematice
+\DeclareMathOperator{\proj}{proj}
+\DeclareMathOperator{\atan}{arctg}
+\newcommand{\jimag}{\mathrm{j}}          % imaginární jednotka (elektrotechnika)
+
+
+\begin{document}
+
+% =====================================================================
+% TITULNÍ STRANA
+% =====================================================================
+\begin{titlepage}
+\centering
+\vspace*{1.5cm}
+{\color{primary}\rule{\textwidth}{2.5pt}}\\[0.8cm]
+{\fontsize{46}{52}\selectfont\bfseries\color{primary} Kinematika\par}
+\vspace{0.4cm}
+{\Large\color{primary!80!black} Popis pohybu hmotného bodu v prostoru a čase\par}
+\vspace{0.5cm}
+{\color{primary}\rule{\textwidth}{2.5pt}}\\[1.2cm]
+
+\begin{tikzpicture}[scale=1.05]
+  \draw[ax] (-0.3,0) -- (6.4,0) node[right]{$x$};
+  \draw[ax] (0,-0.3) -- (0,3.8) node[above]{$y$};
+  \draw[helpl] (0.5,0.5) .. controls (1.3,3.5) and (4.0,3.2) .. (5.5,1.0);
+  \draw[vec] (0,0) -- (3.1,2.65) node[midway,above left]{$\vec r(t)$};
+  \draw[vecg] (3.1,2.65) -- (4.3,3.0) node[midway,above]{$\vec v$};
+  \draw[vecr] (3.1,2.65) -- (2.35,1.35) node[midway,left]{$\vec a$};
+  \fill (3.1,2.65) circle (2pt) node[above right]{$P$};
+  \node[below left] at (0,0) {$O$};
+\end{tikzpicture}
+
+\vspace{1.4cm}
+\begin{tcolorbox}[enhanced,colback=primary!5,colframe=primary!40,boxrule=0.6pt,arc=2mm,width=0.85\textwidth]
+\centering\large
+Studijní text pro 1.~ročník\\[2pt]
+\textbf{Vysoké učení technické v Brně, FEKT}\\[2pt]
+obor Elektronika a komunikační technologie (EKT)
+\end{tcolorbox}
+
+\vspace{1cm}
+\begin{minipage}{0.84\textwidth}
+\centering\normalsize
+Od popisu polohy, rychlosti a zrychlení přes přímočarý a kruhový pohyb
+až po vrhy v tíhovém poli a pohyb s odporem prostředí. Definice, odvození,
+řešené příklady, přehled vzorců a úlohy k procvičení.
+\end{minipage}
+
+\vfill
+{\large\today}
+\end{titlepage}
+
+\pagenumbering{roman}
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+
+% =====================================================================
+\section{Mechanika a kinematika}
+% =====================================================================
+
+\subsection{Co zkoumá mechanika}
+
+\textbf{Mechanika} je část fyziky, která matematicky popisuje mechanický pohyb
+těles v prostoru a čase a zabývá se také jeho příčinami.
+
+\begin{itemize}
+  \item \textbf{Kinematika} popisuje pohyb, aniž zkoumá jeho příčiny.
+  \item \textbf{Dynamika} studuje příčiny pohybu a změn pohybu.
+  \item \textbf{Statika} se zabývá rovnováhou těles.
+\end{itemize}
+
+\begin{definice}{Mechanický pohyb}
+Mechanický pohyb je změna vzájemné polohy těles v prostoru a čase.
+Pohyb je \textbf{relativní}: vždy musíme uvést, vzhledem ke kterému tělesu
+(nebo vztažné soustavě) polohu a pohyb popisujeme.
+\end{definice}
+
+\begin{poznamka}
+V této látce se věnujeme klasické mechanice. Ta je vhodná tehdy, když jsou
+rychlosti těles mnohem menší než rychlost světla ve vakuu
+$c\approx 3\cdot10^8\jed{m\,s^{-1}}$.
+\end{poznamka}
+
+\subsection{Vztažné soustavy}
+
+Pohyb popisujeme pomocí souřadnic vztažených k určité soustavě. V prezentaci
+jsou uvedeny tyto souřadné systémy:
+
+\begin{itemize}
+  \item \textbf{Kartézská soustava:} souřadnice $x,y,z$.
+  \item \textbf{Polární soustava:} poloměr $r$ a úhel $\varphi$.
+  \item \textbf{Cylindrická (válcová) soustava:} $r,\varphi,z$.
+  \item \textbf{Sférická (kulová) soustava:} $r,\varphi,\vartheta$.
+\end{itemize}
+
+Nejčastěji se používá \textbf{laboratorní soustava}, tedy pravotočivá kartézská
+soustava pevně spojená se Zemí.
+
+\subsection{Model hmotného bodu}
+
+\begin{definice}{Hmotný bod}
+Hmotný bod (HB) je idealizovaný model tělesa, u kterého zanedbáváme jeho rozměry,
+rotační pohyb a deformaci. Použijeme jej tehdy, když jsou rozměry tělesa
+v dané úloze zanedbatelné, například vzhledem k uražené dráze.
+\end{definice}
+
+\begin{poznamka}
+Hmotný bod není tvrzení, že těleso skutečně nemá rozměry. Jde o zjednodušení,
+které nám umožní soustředit se pouze na jeho polohu a pohyb.
+\end{poznamka}
+
+Abychom mohli jednoznačně popsat pohyb hmotného bodu, sledujeme především
+tři základní kinematické veličiny:
+\begin{enumerate}
+  \item polohu (polohový vektor) $\vec r$,
+  \item rychlost $\vec v$,
+  \item zrychlení $\vec a$.
+\end{enumerate}
+Mezi další veličiny patří úhlové otočení, úhlová rychlost a úhlové zrychlení.
+
+% =====================================================================
+
+\begin{priklad}{Volba modelu hmotného bodu}
+Automobil projíždí úsekem silnice dlouhým $2\jed{km}$. Rozměry automobilu jsou přibližně $4\jed{m}$. Rozhodněte, zda je vhodné modelovat automobil jako hmotný bod.
+
+\textbf{Řešení.} Poměr délky automobilu k délce úseku je
+\[
+ \frac{4}{2000}=0{,}002=0{,}2\,\%.
+\]
+Rozměry automobilu jsou proti délce sledovaného úseku zanedbatelné. Pokud nás zajímá pouze jeho poloha a doba průjezdu, je model hmotného bodu vhodný. Při studiu parkování nebo otáčení automobilu by už jeho rozměry zanedbatelné nebyly.
+\end{priklad}
+
+\section{Poloha, trajektorie a dráha}
+% =====================================================================
+
+\subsection{Polohový vektor}
+
+\begin{definice}{Polohový vektor}
+Polohový vektor $\vec r$ je vektor vedený z počátku souřadnicové soustavy
+do okamžité polohy hmotného bodu.
+\end{definice}
+
+V kartézské soustavě má tvar
+\begin{equation}
+  \boxed{\vec r=x\ii+y\jj+z\kk}
+\end{equation}
+kde $x,y,z$ jsou souřadnice bodu a $\ii,\jj,\kk$ jsou jednotkové vektory
+ve směru os $x,y,z$.
+
+Velikost polohového vektoru je
+\begin{equation}
+  \boxed{r=\abs{\vec r}=\sqrt{x^2+y^2+z^2}}.
+\end{equation}
+
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}[scale=0.9]
+  \draw[ax] (-0.3,0)--(5.2,0) node[right]{$x$};
+  \draw[ax] (0,-0.3)--(0,4.0) node[above]{$y$};
+  \draw[helpl] (0,0)--(3.8,2.8);
+  \draw[vec] (0,0)--(3.8,2.8) node[midway,above left]{$\vec r$};
+  \draw[dashed,gray] (3.8,0)--(3.8,2.8)--(0,2.8);
+  \fill (3.8,2.8) circle (2pt) node[above right]{$P(x,y)$};
+  \node[below left] at (0,0) {$O$};
+  \node[below] at (1.9,0) {$x$};
+  \node[left] at (0,1.4) {$y$};
+\end{tikzpicture}
+\caption{Polohový vektor v rovině: počátek je v počátku soustavy a konec v bodě $P$.}
+\end{figure}
+
+Směrové kosiny polohového vektoru určují jeho orientaci vůči osám:
+\[
+ \cos\alpha=\frac{x}{r},\qquad
+ \cos\beta=\frac{y}{r},\qquad
+ \cos\gamma=\frac{z}{r}.
+\]
+Platí také vztah
+\[
+ \cos^2\alpha+\cos^2\beta+\cos^2\gamma=1.
+\]
+Základní jednotkové vektory mají souřadnice
+$\ii=(1,0,0)$, $\jj=(0,1,0)$ a $\kk=(0,0,1)$.
+
+\subsection{Časová závislost polohy a parametrické rovnice}
+
+Při pohybu se souřadnice mění s časem. Polohu proto zapisujeme jako
+\begin{equation}
+ \vec r(t)=x(t)\ii+y(t)\jj+z(t)\kk.
+\end{equation}
+Tři skalární funkce
+\[
+ x=x(t),\qquad y=y(t),\qquad z=z(t)
+\]
+se nazývají \textbf{parametrické rovnice trajektorie}. Parametrem je čas $t$.
+Vyloučením času z těchto rovnic získáme rovnici geometrické křivky, po které
+se hmotný bod pohybuje.
+
+\begin{priklad}{Určení trajektorie z polohového vektoru}
+Polohový vektor je zadán vztahem
+\[
+ \vec r(t)=(3{,}6t+4{,}2)\ii+(5{,}4t)\jj\jed{m}.
+\]
+Určete tvar trajektorie.
+
+\medskip
+\textbf{Řešení.} Pohyb probíhá v rovině $xy$, tedy
+\[
+ x=3{,}6t+4{,}2,\qquad y=5{,}4t.
+\]
+Z první rovnice vyjádříme čas:
+\[
+ t=\frac{x-4{,}2}{3{,}6}.
+\]
+Dosadíme do druhé rovnice:
+\[
+ y=5{,}4\frac{x-4{,}2}{3{,}6}
+   =1{,}5x-6{,}3.
+\]
+Trajektorií je přímka se směrnicí $1{,}5$ a průsečíkem s osou $y$
+v bodě $-6{,}3\jed{m}$.
+\end{priklad}
+
+\subsection{Trajektorie a dráha}
+
+\begin{definice}{Trajektorie}
+Trajektorie je množina koncových bodů polohového vektoru při pohybu.
+Je to geometrická křivka, po které se hmotný bod pohybuje.
+\end{definice}
+
+\begin{definice}{Dráha}
+Dráha $s=s(t)$ je délka části trajektorie, kterou hmotný bod urazil
+za sledovaný čas. Jednotkou dráhy i velikosti polohového vektoru je metr
+($\jed{m}$).
+\end{definice}
+
+\begin{pozor}
+Polohový vektor a dráha nejsou totéž. Polohový vektor vede vždy od počátku
+souřadnic do aktuální polohy; dráha měří délku skutečně uražené části trajektorie.
+Při pohybu po zakřivené dráze se jejich velikosti obecně nerovnají.
+\end{pozor}
+
+% =====================================================================
+
+\begin{priklad}{Určení polohy a vzdálenosti od počátku}
+Bod má polohový vektor $\vec r=3\ii+4\jj$ [m]. Určete jeho vzdálenost od počátku soustavy.
+
+\textbf{Řešení.} Velikost polohového vektoru vypočteme z Pythagorovy věty:
+\[
+ r=\abs{\vec r}=\sqrt{3^2+4^2}=5\jed{m}.
+\]
+Bod tedy leží ve vzdálenosti $5\jed{m}$ od počátku. Pozor, tato vzdálenost není obecně délkou trajektorie, kterou bod při pohybu urazil.
+\end{priklad}
+
+\section{Rychlost}
+% =====================================================================
+
+\subsection{Střední a okamžitá rychlost}
+
+Při posunu z bodu $A$ do bodu $B$ se polohový vektor změní o
+$\Delta\vec r=\vec r_B-\vec r_A$. Za čas $\Delta t$ definujeme
+\textbf{střední vektorovou rychlost}
+\[
+ \vec v_{\text{stř}}=\frac{\Delta\vec r}{\Delta t}.
+\]
+Velikost střední rychlosti založená na uražené dráze je
+\[
+ v_{\text{stř}}=\frac{\Delta s}{\Delta t}.
+\]
+Tyto dvě hodnoty obecně nejsou stejné: $\Delta s$ je délka oblouku trajektorie,
+zatímco $\abs{\Delta\vec r}$ je délka přímé spojnice počátečního a koncového bodu.
+
+\begin{definice}{Okamžitá rychlost}
+Okamžitá rychlost je derivace polohového vektoru podle času:
+\begin{equation}
+ \boxed{\vec v=\frac{\mathrm d\vec r}{\mathrm dt}=\dot{\vec r}}.
+\end{equation}
+\end{definice}
+
+V kartézských souřadnicích:
+\begin{equation}
+ \boxed{\vec v=\dot x\ii+\dot y\jj+\dot z\kk
+       =v_x\ii+v_y\jj+v_z\kk}
+\end{equation}
+kde
+\[
+ v_x=\frac{\mathrm dx}{\mathrm dt},\quad
+ v_y=\frac{\mathrm dy}{\mathrm dt},\quad
+ v_z=\frac{\mathrm dz}{\mathrm dt}.
+\]
+Velikost rychlosti je
+\begin{equation}
+ \boxed{v=\abs{\vec v}=\sqrt{v_x^2+v_y^2+v_z^2}}.
+\end{equation}
+Jednotkou rychlosti je $\jed{m\,s^{-1}}$.
+
+\begin{poznamka}
+Vektor okamžité rychlosti má vždy směr tečny k trajektorii a jeho orientace
+odpovídá směru rostoucího času. Velikost rychlosti vyjadřuje, jakou dráhu
+těleso v daném okamžiku urazí za jednotku času.
+\end{poznamka}
+
+\subsection{Řešený příklad: rychlost z polohového vektoru}
+
+\begin{priklad}{Výpočet rychlosti elektronu}
+Poloha elektronu je dána vztahem
+\[
+ \vec r(t)=3{,}0t\ii-4{,}0t^2\jj+2{,}0\kk\jed{m}.
+\]
+Určete (a) časovou závislost rychlosti, (b) rychlost v čase $t=2{,}0\jed{s}$
+a (c) její velikost.
+
+\medskip
+\textbf{a) Časová závislost.} Zderivujeme polohový vektor:
+\[
+ \vec v(t)=\frac{\mathrm d\vec r}{\mathrm dt}
+ =3{,}0\ii-8{,}0t\jj\jed{m\,s^{-1}}.
+\]
+
+\textbf{b) Rychlost v čase $t=2{,}0\jed{s}$.}
+\[
+ \vec v(2)=3{,}0\ii-16{,}0\jj\jed{m\,s^{-1}}.
+\]
+
+\textbf{c) Velikost rychlosti.}
+\[
+ v=\sqrt{3{,}0^2+(-16{,}0)^2}
+   =\sqrt{265}\doteq16{,}3\jed{m\,s^{-1}}.
+\]
+\end{priklad}
+
+% =====================================================================
+\section{Zrychlení}
+% =====================================================================
+
+\subsection{Definice a složky zrychlení}
+
+Vektor rychlosti se může měnit velikostí, směrem nebo obojím současně.
+V takovém případě je pohyb zrychlený.
+
+\begin{definice}{Okamžité zrychlení}
+Okamžité zrychlení je derivace rychlosti podle času, tedy druhá derivace
+polohového vektoru:
+\begin{equation}
+ \boxed{\vec a=\frac{\mathrm d\vec v}{\mathrm dt}
+       =\frac{\mathrm d^2\vec r}{\mathrm dt^2}
+       =\dot{\vec v}=\ddot{\vec r}}.
+\end{equation}
+\end{definice}
+
+V kartézských souřadnicích platí
+\[
+ \vec a=a_x\ii+a_y\jj+a_z\kk,\qquad
+ a_x=\dot v_x,\quad a_y=\dot v_y,\quad a_z=\dot v_z.
+\]
+Jednotkou zrychlení je $\jed{m\,s^{-2}}$.
+
+\begin{pozor}
+Zrychlení nemusí mířit ve směru pohybu. I při konstantní velikosti rychlosti
+může být zrychlení nenulové, pokud se mění směr rychlosti (například při
+rovnoměrném pohybu po kružnici).
+\end{pozor}
+
+\subsection{Tečné a normálové zrychlení}
+
+Při křivočarém pohybu je užitečné rozložit zrychlení do dvou navzájem kolmých
+směrů:
+\begin{itemize}
+ \item \textbf{tečný směr} je rovnoběžný s tečnou k trajektorii,
+ \item \textbf{normálový směr} je kolmý na tečnu a míří do středu křivosti
+       trajektorie.
+\end{itemize}
+
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}[scale=1.0]
+  \draw[thick,gray!70] (0,0) .. controls (1.5,2.8) and (3.6,3.0) .. (5,1.1);
+  \coordinate (P) at (2.7,2.35);
+  \fill (P) circle (2pt) node[above]{$P$};
+  \draw[vecg] (P)--++(1.55,0.55) node[right]{$\vec v$};
+  \draw[vec] (P)--++(1.15,0.42) node[above]{$\vec a_t$};
+  \draw[vecr] (P)--++(-0.65,-1.25) node[below left]{$\vec a_n$};
+  \draw[thick,dashed] (P)--++(0.8,1.4);
+  \node[gray!70!black] at (4.8,3.2) {trajektorie};
+\end{tikzpicture}
+\caption{Rozklad zrychlení na tečnou a normálovou složku (schematicky).}
+\end{figure}
+
+Celkové zrychlení je vektorovým součtem
+\begin{equation}
+ \boxed{\vec a=\vec a_t+\vec a_n}.
+\end{equation}
+Protože složky jsou na sebe kolmé, velikost celkového zrychlení je
+\begin{equation}
+ \boxed{a=\sqrt{a_t^2+a_n^2}}.
+\end{equation}
+
+Velikosti složek:
+\begin{equation}
+ \boxed{a_t=\frac{\mathrm dv}{\mathrm dt}},\qquad
+ \boxed{a_n=\frac{v^2}{R}},
+\end{equation}
+kde $R$ je poloměr oskulační kružnice (poloměr křivosti trajektorie).
+Tečné zrychlení popisuje změnu velikosti rychlosti, normálové zrychlení
+změnu jejího směru.
+
+\subsection{Co nám říkají jednotlivé složky}
+
+\begin{itemize}
+ \item Mění-li se pouze velikost rychlosti, je $\vec a=\vec a_t$.
+ \item Mění-li se pouze směr rychlosti, je $\vec a=\vec a_n$.
+ \item Mění-li se velikost i směr rychlosti, jsou přítomny obě složky:
+       $\vec a=\vec a_t+\vec a_n$.
+\end{itemize}
+
+\begin{poznamka}
+Normálová složka je nezáporná a směřuje do středu křivosti. Tečná složka
+může podle toho, zda se rychlost zvětšuje nebo zmenšuje, působit ve směru
+pohybu nebo proti němu.
+\end{poznamka}
+
+% =====================================================================
+
+\begin{priklad}{Zrychlení z časové závislosti rychlosti}
+Rychlost bodu se mění podle vztahu $v(t)=2+3t^2$ [m/s]. Určete zrychlení v čase $t=2\jed{s}$.
+
+\textbf{Řešení.} Zrychlení je derivací rychlosti podle času:
+\[
+ a(t)=\frac{\mathrm dv}{\mathrm dt}=6t.
+\]
+Pro $t=2\jed{s}$ dostáváme
+\[
+ a(2)=6\cdot2=12\jed{m\,s^{-2}}.
+\]
+Zrychlení v daném okamžiku má velikost $12\jed{m\,s^{-2}}$.
+\end{priklad}
+
+\section{Přímočarý pohyb (1D)}
+% =====================================================================
+
+\subsection{Zjednodušení na jednu dimenzi}
+
+Při přímočarém pohybu je trajektorií přímka. Normálové zrychlení je nulové,
+tedy $a_n=0$, a celkové zrychlení je pouze tečné. Vektory polohy, rychlosti
+a zrychlení leží na stejné přímce. Můžeme proto pracovat s jejich
+orientovanými skalárními složkami.
+
+\subsection{Dvě základní úlohy kinematiky}
+
+V kinematice řešíme dva základní typy úloh:
+
+\begin{enumerate}
+ \item \textbf{Je zadána poloha $\vec r(t)$.} Derivací získáme rychlost
+       a další derivací zrychlení:
+       \[
+        \vec r(t)\ \xrightarrow{\text{derivace}}\
+        \vec v(t)\ \xrightarrow{\text{derivace}}\ \vec a(t).
+       \]
+       Úloha je jednoznačná.
+ \item \textbf{Je zadáno zrychlení $\vec a(t)$.} Integrací získáme rychlost
+       a další integrací polohu:
+       \[
+        \vec a(t)\ \xrightarrow{\text{integrace}}\
+        \vec v(t)\ \xrightarrow{\text{integrace}}\ \vec r(t).
+       \]
+       Musíme znát počáteční podmínky, tedy počáteční rychlost a polohu.
+\end{enumerate}
+
+\subsection{Pohyb s konstantním zrychlením}
+
+Předpokládejme, že zrychlení je konstantní:
+\[
+ a=\mathrm{konst.}
+\]
+Z definice zrychlení
+\[
+ a=\frac{\mathrm dv}{\mathrm dt}
+ \quad\Longrightarrow\quad
+ \mathrm dv=a\,\mathrm dt.
+\]
+Integrací dostaneme
+\[
+ v=at+C_1.
+\]
+Pro počáteční čas $t=0$ je rychlost $v(0)=v_0$, a proto $C_1=v_0$.
+
+\begin{veta}{Rychlost při konstantním zrychlení}
+\begin{equation}
+ \boxed{v(t)=v_0+at}.
+\end{equation}
+\end{veta}
+
+Nyní použijeme vztah $v=\mathrm ds/\mathrm dt$:
+\[
+ \mathrm ds=(v_0+at)\,\mathrm dt.
+\]
+Po integraci a dosazení počáteční podmínky $s(0)=s_0$ získáme
+\begin{equation}
+ \boxed{s(t)=s_0+v_0t+\frac12at^2}.
+\end{equation}
+
+\begin{veta}{Poloha při konstantním zrychlení}
+Pro přímočarý pohyb s konstantním zrychlením platí
+\[
+ \boxed{s=s_0+v_0t+\frac12at^2,\qquad v=v_0+at,\qquad a=\mathrm{konst.}}
+\]
+\end{veta}
+
+\begin{poznamka}
+Znaménka veličin jsou důležitá. Zvolíme kladný směr osy a rychlost i zrychlení
+zapisujeme se znaménkem podle jejich orientace. Záporné zrychlení samo o sobě
+neznamená vždy zpomalování: záleží také na znaménku rychlosti.
+\end{poznamka}
+
+\subsection{Přímočarý rovnoměrný pohyb}
+
+Při rovnoměrném přímočarém pohybu je zrychlení nulové a rychlost konstantní:
+\[
+ a=0,\qquad v=\mathrm{konst.}
+\]
+Integrací rychlosti získáme
+\begin{equation}
+ \boxed{s=s_0+vt}.
+\end{equation}
+Pokud volíme počátek dráhy v počáteční poloze, tedy $s_0=0$, zjednoduší se
+vztah na $s=vt$.
+
+\subsection{Přímočarý rovnoměrně zrychlený a zpomalený pohyb}
+
+Jestliže je zrychlení konstantní a nenulové, jde o přímočarý rovnoměrně
+zrychlený (případně zpomalený) pohyb. O tom, zda těleso zrychluje nebo zpomaluje,
+rozhoduje vzájemné znaménko $v$ a $a$:
+\begin{itemize}
+ \item stejné znaménko $v$ a $a$: velikost rychlosti roste,
+ \item opačné znaménko $v$ a $a$: velikost rychlosti klesá.
+\end{itemize}
+
+\begin{ekt}
+Kinematické vztahy se používají například při popisu pohybu mechanických částí
+přístrojů, dopravních prostředků, pohybu nosičů a při převodu mezi časovým
+průběhem polohy, rychlosti a zrychlení. V elektrotechnických aplikacích se
+s nimi lze setkat také při popisu pohybu mechanismů a snímačů.
+\end{ekt}
+
+% =====================================================================
+
+\begin{priklad}{Brzdění automobilu}
+Automobil jede rychlostí $v_0=20\jed{m\,s^{-1}}$ a začne rovnoměrně brzdit se zrychlením $a=-4\jed{m\,s^{-2}}$. Určete dobu do zastavení a brzdnou dráhu.
+
+\textbf{Řešení.} V okamžiku zastavení je $v=0$. Ze vztahu $v=v_0+at$ plyne
+\[
+ 0=20-4t\quad\Rightarrow\quad t=5\jed{s}.
+\]
+Brzdná dráha při počáteční poloze $s_0=0$ je
+\[
+ s=v_0t+\frac12at^2=20\cdot5-\frac12\cdot4\cdot25
+ =50\jed{m}.
+\]
+Automobil se zastaví za $5\jed{s}$ a ujede přitom $50\jed{m}$.
+\end{priklad}
+
+\section{Kruhový pohyb}
+% =====================================================================
+
+\subsection{Základní popis}
+
+Kruhový pohyb je pohyb, jehož trajektorií je kružnice. Jde o pohyb v rovině,
+tedy o dvourozměrný problém. Pro jeho popis jsou vhodné polární souřadnice:
+poloměr $r$ a úhel $\varphi(t)$. Pro kružnici se středem v počátku je
+$r=\mathrm{konst.}$
+
+Vztah ke kartézským souřadnicím:
+\[
+ x=r\cos\varphi,\qquad y=r\sin\varphi.
+\]
+Polohový vektor lze zapsat
+\[
+ \vec r=(r\cos\varphi)\ii+(r\sin\varphi)\jj.
+\]
+
+\subsection{Úhlová dráha a úhlová rychlost}
+
+\begin{definice}{Úhlová rychlost}
+Úhlová rychlost vyjadřuje změnu úhlové dráhy v čase:
+\begin{equation}
+ \boxed{\omega=\frac{\mathrm d\varphi}{\mathrm dt}}.
+\end{equation}
+\end{definice}
+
+Při rovnoměrném kruhovém pohybu roste úhel rovnoměrně s časem:
+\[
+ \varphi(t)=\omega t
+\]
+(pro počáteční úhel nulový). Polohový vektor je potom
+\[
+ \vec r(t)=r\cos(\omega t)\ii+r\sin(\omega t)\jj.
+\]
+
+Délka oblouku kružnice odpovídající úhlu $\varphi$ (v radiánech) je
+\begin{equation}
+ \boxed{s=r\varphi}.
+\end{equation}
+
+\subsection{Obvodová rychlost}
+
+Derivací polohového vektoru rovnoměrného kruhového pohybu získáme
+\[
+ \vec v(t)=-r\omega\sin(\omega t)\ii
+            +r\omega\cos(\omega t)\jj.
+\]
+Její velikost je
+\[
+ v=\sqrt{r^2\omega^2\sin^2(\omega t)+r^2\omega^2\cos^2(\omega t)}
+   =r\omega.
+\]
+Tedy
+\begin{equation}
+ \boxed{v=r\omega}.
+\end{equation}
+Obvodová rychlost má směr tečny ke kružnici a je kolmá na poloměr.
+
+Vektorově lze vztah zapsat
+\[
+ \boxed{\vec v=\vec\omega\times\vec r}.
+\]
+Vektory úhlového otočení, úhlové rychlosti a úhlového zrychlení leží
+ve směru osy otáčení.
+
+\subsection{Dostředivé zrychlení}
+
+Při rovnoměrném kruhovém pohybu je velikost rychlosti konstantní, ale její
+směr se neustále mění. Proto je tečné zrychlení nulové a zrychlení má pouze
+normálovou složku, která míří do středu kružnice.
+
+\begin{equation}
+ \boxed{a_n=r\omega^2=\frac{v^2}{r}},\qquad
+ \boxed{a_t=0}.
+\end{equation}
+Toto zrychlení se nazývá \textbf{dostředivé zrychlení}.
+
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}[scale=1.05]
+  \draw[thick,gray!70] (0,0) circle (2);
+  \fill (0,0) circle (2pt) node[below left]{$S$};
+  \coordinate (P) at (1.2,1.6);
+  \fill (P) circle (2pt) node[above right]{$P$};
+  \draw[vec] (0,0)--(P) node[midway,above left]{$\vec r$};
+  \draw[vecg] (P)--++(-1.28,0.96) node[above left]{$\vec v$};
+  \draw[vecr] (P)--(0,0) node[midway,right]{$\vec a_n$};
+\end{tikzpicture}
+\caption{Při rovnoměrném pohybu po kružnici míří rychlost po tečně a dostředivé zrychlení do středu.}
+\end{figure}
+
+\subsection{Perioda a frekvence}
+
+\begin{definice}{Perioda}
+Perioda $T$ je doba jednoho úplného oběhu. Při jednom oběhu se úhel změní
+o $2\pi$ radiánů. Z rovnice $\varphi=\omega t$ pro $t=T$ plyne
+\begin{equation}
+ \boxed{T=\frac{2\pi}{\omega}}.
+\end{equation}
+Jednotkou periody je sekunda ($\jed{s}$).
+\end{definice}
+
+\begin{definice}{Frekvence}
+Frekvence $f$ je počet oběhů za sekundu. Je převrácenou hodnotou periody:
+\begin{equation}
+ \boxed{f=\frac1T}.
+\end{equation}
+Jednotkou je $\jed{s^{-1}}$, která se nazývá hertz ($\jed{Hz}$).
+\end{definice}
+
+Spojením vztahů pro periodu a frekvenci dostaneme
+\begin{equation}
+ \boxed{\omega=2\pi f}.
+\end{equation}
+
+\begin{priklad}{Perioda, frekvence a obvodová rychlost}
+Kolo se otáčí frekvencí $f=5\jed{Hz}$. Jeho poloměr je $r=0{,}20\jed{m}$.
+Určete periodu, úhlovou rychlost a obvodovou rychlost bodu na obvodu.
+
+\medskip
+\textbf{Řešení.} Perioda:
+\[
+ T=\frac1f=\frac15=0{,}20\jed{s}.
+\]
+Úhlová rychlost:
+\[
+ \omega=2\pi f=10\pi\doteq31{,}4\jed{rad\,s^{-1}}.
+\]
+Obvodová rychlost:
+\[
+ v=r\omega=0{,}20\cdot10\pi=2\pi
+ \doteq6{,}28\jed{m\,s^{-1}}.
+\]
+\end{priklad}
+
+\subsection{Rovnoměrný a nerovnoměrný kruhový pohyb}
+
+U kruhového pohybu je normálové zrychlení spojeno se změnou směru rychlosti.
+Tečné zrychlení určuje změnu velikosti rychlosti:
+\begin{itemize}
+ \item \textbf{Rovnoměrný kruhový pohyb:} velikost rychlosti je konstantní,
+       $a_t=0$; normálové zrychlení je nenulové.
+ \item \textbf{Nerovnoměrný kruhový pohyb:} velikost rychlosti se mění,
+       $a_t\neq0$; vedle normálové složky je přítomna i tečná složka.
+\end{itemize}
+
+\begin{pozor}
+V prezentaci je u nerovnoměrného kruhového pohybu uvedeno
+$a_n=\mathrm{konst.}\neq0$. Obecně to ale z definice
+$a_n=v^2/r$ neplyne: při konstantním poloměru a měnící se rychlosti se mění
+i velikost normálového zrychlení. Pro řešení úloh proto používej vztah
+$a_n=v^2/r$ a konkrétní zadané hodnoty.
+\end{pozor}
+
+% =====================================================================
+\section{Skládání pohybů a princip nezávislosti}
+% =====================================================================
+
+Pohyb v rovině nebo prostoru lze rozložit do pohybů ve zvolených směrech,
+nejčastěji do os kartézské soustavy $x,y,z$. Každou složku popisujeme
+samostatně a výsledný polohový vektor získáme jejich vektorovým součtem.
+
+\begin{veta}{Princip nezávislosti pohybů}
+Koná-li hmotný bod současně několik pohybů po stejnou dobu, výsledná poloha
+je stejná, jako kdyby jednotlivé pohyby vykonal postupně v libovolném pořadí.
+Pohyb v jedné ose tedy neovlivňuje pohyb v ose kolmé, pokud na sebe složky
+nejsou fyzikálně svázány (například odporem vzduchu).
+\end{veta}
+
+V kartézské soustavě platí
+\[
+ \vec r(t)=x(t)\,\vec i+y(t)\,\vec j+z(t)\,\vec k.
+\]
+Rychlost a zrychlení získáme derivováním jednotlivých souřadnic:
+\[
+ \vec v=(\dot x,\dot y,\dot z),\qquad
+ \vec a=(\ddot x,\ddot y,\ddot z).
+\]
+
+\begin{poznamka}
+Při skládání pohybů je nutné používat stejný čas a jednu společnou vztažnou
+soustavu. U vrhů bez odporu vzduchu se vodorovná a svislá složka řeší
+nezávisle; obě však popisují tutéž dobu letu.
+\end{poznamka}
+
+% =====================================================================
+
+\begin{priklad}{Loď plující přes řeku}
+Řeka je široká $120\jed{m}$. Loď se vzhledem k vodě pohybuje kolmo ke břehu rychlostí $3\jed{m\,s^{-1}}$. Proud ji unáší po proudu rychlostí $1\jed{m\,s^{-1}}$. Určete dobu přeplutí a posunutí po proudu.
+
+\textbf{Řešení.} Dobu přeplutí určuje složka rychlosti kolmá ke břehu:
+\[
+ t=\frac{120}{3}=40\jed{s}.
+\]
+Za tuto dobu proud posune loď po proudu o
+\[
+ x=1\cdot40=40\jed{m}.
+\]
+Loď tedy dopluje na protější břeh za $40\jed{s}$ a místo přímo naproti výchozímu bodu mine o $40\jed{m}$ po proudu.
+\end{priklad}
+
+\section{Pohyb v homogenním tíhovém poli Země}
+% =====================================================================
+
+V blízkosti povrchu Země lze tíhové zrychlení považovat za konstantní,
+\[
+ \vec g=(0,-g),\qquad g\doteq9{,}81\jed{m\,s^{-2}},
+\]
+pokud zvolíme osu $y$ svisle vzhůru. V následujících úlohách zanedbáváme
+odpor vzduchu a rozměry tělesa; těleso modelujeme jako hmotný bod.
+
+\subsection{Volný pád}
+
+Volný pád je pohyb s nulovou počáteční rychlostí, při němž těleso padá
+svisle dolů pouze působením tíhového zrychlení. Při volbě kladného směru
+osy dolů a počátku v místě vypuštění platí
+\[
+ v(t)=gt,\qquad s(t)=\frac12gt^2,\qquad a=g.
+\]
+Při pádu z výšky $h$ je doba pádu $t=\sqrt{2h/g}$ a rychlost těsně před
+dopadem $v=\sqrt{2gh}$.
+
+\subsection{Svislý vrh}
+
+Pro svislý vrh vzhůru z výšky $y_0$ zvolíme osu $y$ kladně vzhůru.
+Počáteční rychlost $v_0$ má kladné znaménko a zrychlení je $-g$:
+\[
+ y(t)=y_0+v_0t-\frac12gt^2,\qquad v_y(t)=v_0-gt.
+\]
+V nejvyšším bodě je okamžitá svislá rychlost nulová. Doba výstupu
+$t_{\max}=v_0/g$ a přírůstek výšky $h_{\max}=v_0^2/(2g)$.
+
+Při svislém vrhu dolů je při stejné orientaci osy počáteční rychlost
+záporná, pokud je vrženo dolů; lze také zvolit kladný směr dolů. Důležité
+je zachovat zvolenou orientaci osy v celém výpočtu. Obecná rovnice
+\[
+ y(t)=y_0+v_{0y}t-\frac12gt^2
+\]
+platí pro obě varianty při ose $y$ orientované vzhůru.
+
+\subsection{Vodorovný vrh}
+
+Těleso je vrženo vodorovně počáteční rychlostí $v_0$ z výšky $h$.
+Vodorovný pohyb je rovnoměrný a svislý pohyb je volný pád:
+\[
+ x(t)=v_0t,\qquad y(t)=h-\frac12gt^2,
+\]
+\[
+ v_x=v_0,\qquad v_y=-gt,\qquad
+ v(t)=\sqrt{v_0^2+g^2t^2}.
+\]
+Z rovnice pro $x$ plyne $t=x/v_0$. Dosazením do rovnice pro $y$ dostaneme
+trajektorii
+\[
+ y(x)=h-\frac{g}{2v_0^2}x^2,
+\]
+tedy část paraboly. Doba pádu a vodorovný dolet jsou
+\[
+ t_p=\sqrt{\frac{2h}{g}},\qquad
+ d=v_0\sqrt{\frac{2h}{g}}.
+\]
+
+\subsection{Šikmý vrh}
+
+Při šikmém vrhu svírá počáteční rychlost $v_0$ s vodorovnou osou elevační
+úhel $\alpha$. Její složky jsou
+\[
+ v_{0x}=v_0\cos\alpha,\qquad v_{0y}=v_0\sin\alpha.
+\]
+Při počátku soustavy v místě vrhu platí parametrické rovnice:
+\[
+ x(t)=v_0\cos\alpha\,t,
+ \qquad y(t)=v_0\sin\alpha\,t-\frac12gt^2.
+\]
+Složky rychlosti jsou
+\[
+ v_x(t)=v_0\cos\alpha,\qquad
+ v_y(t)=v_0\sin\alpha-gt.
+\]
+Po vyloučení času získáme rovnici trajektorie:
+\[
+ y(x)=x\tan\alpha-\frac{g x^2}{2v_0^2\cos^2\alpha}.
+\]
+Pro dopad do stejné výšky, z níž bylo těleso vrženo, platí (bez odporu
+vzduchu)
+\[
+ t_p=\frac{2v_0\sin\alpha}{g},\qquad
+ d=\frac{v_0^2\sin(2\alpha)}{g},\qquad
+ h_{\max}=\frac{v_0^2\sin^2\alpha}{2g}.
+\]
+
+\begin{pozor}
+Vzorce pro dobu letu a dolet šikmého vrhu v posledním řádku platí jen tehdy,
+když těleso dopadne do stejné výšky, z níž bylo vrženo. Obecně je třeba
+určit čas dopadu z rovnice pro svislou souřadnici.
+\end{pozor}
+
+\subsection{Řešené úlohy k vrhům}
+
+\begin{priklad}{Automobil rozjíždějící se po kruhové dráze}
+Automobil se rozjíždí z klidu po kruhové dráze o poloměru
+$r=30\jed{m}$. Tečné zrychlení má konstantní velikost
+$a_t=0{,}5\jed{m\,s^{-2}}$. Určete velikost zrychlení po
+$t=15\jed{s}$ a úhel mezi vektorem zrychlení a tečným směrem.
+
+\textbf{Řešení.} Nejprve určíme rychlost:
+\[
+ v=a_tt=0{,}5\cdot15=7{,}5\jed{m\,s^{-1}}.
+\]
+Normálové zrychlení je
+\[
+ a_n=\frac{v^2}{r}=\frac{7{,}5^2}{30}=1{,}875\jed{m\,s^{-2}}.
+\]
+Složky jsou na sebe kolmé, proto
+\[
+ a=\sqrt{a_t^2+a_n^2}
+ =\sqrt{0{,}5^2+1{,}875^2}
+ \doteq1{,}94\jed{m\,s^{-2}}.
+\]
+Úhel od tečného směru k výslednému zrychlení je
+\[
+ \gamma=\arctan\frac{a_n}{a_t}\doteq75{,}1^\circ.
+\]
+\end{priklad}
+
+\begin{priklad}{Vodorovný vrh ze stejné výšky}
+Dvě kuličky jsou vrženy vodorovně ze stejné výšky; druhá má dvojnásobnou
+počáteční rychlost. Jak se změní doba pádu?
+
+\textbf{Řešení.} Svislý pohyb obou kuliček je popsán stejnou rovnicí
+$h=\frac12gt^2$. Vodorovná počáteční rychlost se v této rovnici nevyskytuje,
+proto je doba pádu stejná. Druhá kulička urazí za stejnou dobu dvojnásobnou
+vodorovnou vzdálenost.
+\end{priklad}
+
+\begin{priklad}{Srážka dvou svisle vržených těles}
+První těleso je vrženo svisle vzhůru rychlostí $v_0=28{,}5\jed{m\,s^{-1}}$.
+Druhé těleso je ze stejného místa vrženo stejnou rychlostí o
+$\Delta t=0{,}6\jed{s}$ později. Určete výšku, ve které se srazí.
+
+\textbf{Řešení.} Čas $t$ měříme od vrhu prvního tělesa. Pro $t\geq\Delta t$
+jsou výšky
+\[
+ y_1=v_0t-\frac12gt^2,\qquad
+ y_2=v_0(t-\Delta t)-\frac12g(t-\Delta t)^2.
+\]
+Z podmínky $y_1=y_2$ vyjde
+\[
+ t=\frac{v_0}{g}+\frac{\Delta t}{2}.
+\]
+Výška srážky je
+\[
+ y=\frac{v_0^2}{2g}-\frac{g(\Delta t)^2}{8}
+ \doteq40{,}9\jed{m}.
+\]
+\end{priklad}
+
+\begin{priklad}{Určení rychlosti střely vodorovným vrhem}
+Střela proletí dvěma svislými štíty vzdálenými o $\Delta l$; na druhém
+štítu je její průstřel níže o $\Delta h$. Předpokládejte vodorovný výstřel
+a zanedbejte ztrátu energie ve štítech. Čas mezi štíty určí vodorovný pohyb
+$\Delta t=\Delta l/v_0$. Svislý pokles za tento čas závisí také na svislé
+rychlosti, kterou střela již při prvním štítu má; proto samotné
+$\Delta h$ a $\Delta l$ bez další informace (například vzdálenosti prvního
+štítu od ústí hlavně a výšky výstřelu) obecně nestačí k jednoznačnému
+určení $v_0$. Je nutné sestavit svislou rovnici pro oba průstřely.
+\end{priklad}
+
+% =====================================================================
+\section{Pohyb v odporujícím prostředí}
+% =====================================================================
+
+V prezentaci je uveden model odporující síly úměrné rychlosti. Pro svislý
+pohyb dolů zvolíme kladný směr dolů a píšeme
+\[
+ \frac{\mathrm dv}{\mathrm dt}=g-\beta v,
+\]
+kde $\beta>0$ je koeficient odporu vztažený k jednotkové hmotnosti
+(jeho jednotka je $\jed{s^{-1}}$). Při počáteční podmínce $v(0)=0$
+provedeme separaci proměnných:
+\[
+ \frac{\mathrm dv}{g-\beta v}=\mathrm dt.
+\]
+Integrací dostaneme
+\[
+ v(t)=\frac g\beta\left(1-e^{-\beta t}\right).
+\]
+Rychlost se postupně blíží mezní hodnotě
+\[
+ v_{\mathrm{mez}}=\frac g\beta.
+\]
+Pro obecnou počáteční rychlost $v(0)=v_0$ je řešení
+\[
+ v(t)=\frac g\beta+\left(v_0-\frac g\beta\right)e^{-\beta t}.
+\]
+
+\begin{poznamka}
+Tento model odporu je zjednodušený: předpokládá sílu úměrnou rychlosti
+(nikoliv druhé mocnině rychlosti). Je vhodný jen v režimu, v němž taková
+závislost přibližně odpovídá skutečnosti. Vztah pro rychlost je výsledkem
+řešení diferenciální rovnice, nikoliv kinematického vzorce s konstantním
+zrychlením.
+\end{poznamka}
+
+\subsection{Postup řešení úlohy v tíhovém poli}
+
+\begin{enumerate}
+ \item Zvolte hmotný bod a rozhodněte, zda lze zanedbat odpor vzduchu.
+ \item Zvolte počátek a orientaci souřadné soustavy.
+ \item Zapište zrychlení do jednotlivých os.
+ \item Integrací zrychlení určete rychlost; použijte počáteční rychlost.
+ \item Integrací rychlosti určete polohu; použijte počáteční polohu.
+ \item Zkontrolujte jednotky, znaménka a počáteční podmínky.
+\end{enumerate}
+
+% =====================================================================
+
+\begin{priklad}{Rychlost při odporu úměrném rychlosti}
+Těleso padá z klidu v prostředí, kde platí model odporu $\mathrm dv/\mathrm dt=g-\beta v$. Je dáno $\beta=0{,}5\jed{s^{-1}}$. Určete mezní rychlost a rychlost po $2\jed{s}$.
+
+\textbf{Řešení.} Mezní rychlost je
+\[
+ v_{\mathrm{mez}}=\frac{g}{\beta}=\frac{9{,}81}{0{,}5}
+ =19{,}62\jed{m\,s^{-1}}.
+\]
+Pro počáteční klid použijeme
+\[
+ v(t)=\frac{g}{\beta}(1-e^{-\beta t}).
+\]
+Po dvou sekundách tedy
+\[
+ v(2)=19{,}62(1-e^{-1})\doteq12{,}39\jed{m\,s^{-1}}.
+\]
+Rychlost je menší než mezní rychlost a postupně se k ní blíží.
+\end{priklad}
+
+\section{Přehled druhů pohybu}
+% =====================================================================
+
+Následující tabulka shrnuje rozdělení pohybů podle normálového a tečného
+zrychlení:
+
+\begin{center}
+\small
+\begin{tabular}{@{}p{0.48\textwidth}cc@{}}
+\toprule
+\textbf{Druh pohybu} & $\boldsymbol{a_n}$ & $\boldsymbol{a_t}$\\
+\midrule
+Přímočarý rovnoměrný & $0$ & $0$\\
+Přímočarý nerovnoměrný & $0$ & $\neq0$\\
+Přímočarý rovnoměrně zrychlený/zpomalený & $0$ & konst. $\neq0$\\
+Kruhový rovnoměrný & konst. $\neq0$ & $0$\\
+Kruhový nerovnoměrný & obecně $\neq0$ & $\neq0$\\
+Křivočarý rovnoměrný & $\neq0$ & $0$\\
+Křivočarý nerovnoměrný & $\neq0$ & $\neq0$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{poznamka}
+Uvedené rozdělení vychází z toho, zda se mění velikost rychlosti ($a_t$)
+a zda se mění její směr ($a_n$). Při přímočarém pohybu je normálová složka
+nulová; při křivočarém pohybu je obecně nenulová.
+\end{poznamka}
+
+% =====================================================================
+
+\begin{priklad}{Určení druhu pohybu podle zrychlení}
+Uvažujme tři situace: (A) automobil jede po přímé silnici stálou rychlostí, (B) bod obíhá po kružnici stálou velikostí rychlosti, (C) automobil zrychluje po přímé silnici. Určete, které složky zrychlení jsou v jednotlivých případech nenulové.
+
+\textbf{Řešení.}
+\begin{itemize}
+ \item (A) Směr ani velikost rychlosti se nemění, proto $a_t=0$ a $a_n=0$.
+ \item (B) Velikost rychlosti se nemění, ale mění se její směr, proto $a_t=0$ a $a_n\neq0$.
+ \item (C) Směr rychlosti se nemění, ale její velikost roste, proto $a_t\neq0$ a $a_n=0$.
+\end{itemize}
+Příklady ukazují, že tečné zrychlení souvisí se změnou velikosti rychlosti a normálové se změnou jejího směru.
+\end{priklad}
+
+\section{Souhrn vzorců}
+% =====================================================================
+
+\begin{tcolorbox}[enhanced,breakable,colback=primary!4,colframe=primary,
+  title={\bfseries Základní kinematické vztahy},fonttitle=\bfseries,coltitle=white,colbacktitle=primary]
+\textbf{Poloha a trajektorie}
+\[
+ \vec r=x\ii+y\jj+z\kk,\qquad
+ r=\sqrt{x^2+y^2+z^2}
+\]
+\textbf{Rychlost}
+\[
+ \vec v=\frac{\mathrm d\vec r}{\mathrm dt},\qquad
+ v=\sqrt{v_x^2+v_y^2+v_z^2}
+\]
+\textbf{Zrychlení}
+\[
+ \vec a=\frac{\mathrm d\vec v}{\mathrm dt}
+       =\frac{\mathrm d^2\vec r}{\mathrm dt^2}
+\]
+\textbf{Tečné a normálové složky}
+\[
+ \vec a=\vec a_t+\vec a_n,\qquad
+ a=\sqrt{a_t^2+a_n^2},\qquad
+ a_t=\frac{\mathrm dv}{\mathrm dt},\quad a_n=\frac{v^2}{R}
+\]
+\textbf{Přímočarý pohyb s konstantním zrychlením}
+\[
+ v=v_0+at,\qquad s=s_0+v_0t+\frac12at^2
+\]
+\textbf{Přímočarý rovnoměrný pohyb}
+\[
+ a=0,\qquad v=\mathrm{konst.},\qquad s=s_0+vt
+\]
+\textbf{Kruhový pohyb}
+\[
+ s=r\varphi,\qquad \omega=\frac{\mathrm d\varphi}{\mathrm dt},
+ \qquad v=r\omega,\qquad a_n=r\omega^2=\frac{v^2}{r}
+\]
+\textbf{Vrh v homogenním tíhovém poli (osa $y$ vzhůru)}
+\[
+ x=x_0+v_{0x}t,\quad y=y_0+v_{0y}t-\frac12gt^2,
+ \quad v_y=v_{0y}-gt
+\]
+\textbf{Vodorovný vrh z výšky $h$}
+\[
+ t_p=\sqrt{\frac{2h}{g}},\qquad d=v_0t_p
+\]
+\textbf{Odpor úměrný rychlosti, počáteční klid}
+\[
+ v(t)=\frac g\beta(1-e^{-\beta t}),\qquad v_{\rm mez}=\frac g\beta
+\]
+\textbf{Perioda a frekvence}
+\[
+ T=\frac{2\pi}{\omega},\qquad f=\frac1T,\qquad \omega=2\pi f
+\]
+\end{tcolorbox}
+
+
+
+\section{Příklady k procvičení}
+% =====================================================================
+
+\begin{enumerate}[label=\textbf{\arabic*.},leftmargin=*,itemsep=4pt]
+ \item Polohový vektor bodu je $\vec r(t)=2t\ii+3t^2\jj+4t\kk$ [m].
+       Určete souřadnice polohy v čase $t=2\jed{s}$, vektor rychlosti,
+       vektor zrychlení a velikost rychlosti v tomto čase.
+ \item Pohyb v rovině je zadán rovnicemi $x=4t+2$ a $y=2t-6$.
+       Určete rovnici trajektorie a rozhodněte, zda jde o přímočarý pohyb.
+ \item Těleso se pohybuje po přímce podle vztahu
+       $s(t)=5+3t+2t^2$ [m]. Určete $v(t)$, $a(t)$ a rychlost v čase $t=3\jed{s}$.
+ \item Automobil jede rychlostí $v_0=10\jed{m\,s^{-1}}$ a zrychluje
+       konstantně $a=2\jed{m\,s^{-2}}$. Určete rychlost a uraženou dráhu
+       po $5\jed{s}$, jestliže $s_0=0$.
+ \item Těleso se pohybuje rovnoměrně rychlostí $v=6\jed{m\,s^{-1}}$.
+       Jakou dráhu urazí za $12\jed{s}$?
+ \item Bod se pohybuje po kružnici o poloměru $r=0{,}5\jed{m}$ úhlovou
+       rychlostí $\omega=8\jed{rad\,s^{-1}}$. Určete obvodovou rychlost
+       a dostředivé zrychlení.
+ \item Kolo vykoná $120$ otáček za minutu. Určete frekvenci, periodu
+       a úhlovou rychlost.
+ \item Těleso obíhá po kružnici o poloměru $r=2\jed{m}$ rychlostí
+       $v=4\jed{m\,s^{-1}}$. Určete dostředivé zrychlení a dobu jednoho oběhu.
+ \item Rychlost částice se zvětší z $4\jed{m\,s^{-1}}$ na
+       $10\jed{m\,s^{-1}}$ za $3\jed{s}$. Předpokládejte konstantní tečné
+       zrychlení. Určete jeho velikost.
+ \item Vysvětlete vlastními slovy rozdíl mezi tečným a normálovým zrychlením.
+       Uveďte příklad pohybu, při kterém je přítomna pouze jedna z těchto složek.
+\end{enumerate}
+
+\newpage
+
+\subsection*{Výsledky}
+
+\begin{enumerate}[label=\textbf{\arabic*.},leftmargin=*,itemsep=2pt]
+ \item $\vec r(2)=4\ii+12\jj+8\kk$ [m],
+       $\vec v(t)=2\ii+6t\jj+4\kk$ [m/s],
+       $\vec a=6\jj$ [m/s$^2$],
+       $\vec v(2)=2\ii+12\jj+4\kk$ [m/s],
+       $v(2)=\sqrt{164}\doteq12{,}81\jed{m\,s^{-1}}$.
+ \item $y=0{,}5x-7$; trajektorie je přímka, pohyb je přímočarý.
+ \item $v(t)=3+4t$ [m/s], $a=4$ [m/s$^2$], $v(3)=15$ [m/s].
+ \item $v=20\jed{m\,s^{-1}}$, $s=75\jed{m}$.
+ \item $s=72\jed{m}$.
+ \item $v=4\jed{m\,s^{-1}}$, $a_n=32\jed{m\,s^{-2}}$.
+ \item $f=2\jed{Hz}$, $T=0{,}5\jed{s}$, $\omega=4\pi\doteq12{,}57\jed{rad\,s^{-1}}$.
+ \item $a_n=8\jed{m\,s^{-2}}$, $T=2\pi r/v=\pi\jed{s}\doteq3{,}14\jed{s}$.
+ \item $a_t=(10-4)/3=2\jed{m\,s^{-2}}$.
+ \item Tečné zrychlení mění velikost rychlosti (např. přímočaré zrychlování);
+       normálové mění směr rychlosti (např. rovnoměrný pohyb po kružnici).
+\end{enumerate}
+
+\end{document}
